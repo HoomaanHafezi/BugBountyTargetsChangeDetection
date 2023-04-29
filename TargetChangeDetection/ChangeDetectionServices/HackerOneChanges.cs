@@ -18,6 +18,10 @@ public static class HackerOneChanges
         
             Console.WriteLine("\nHackerOne -----------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "HackerOneDataChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData)
             {
                 if (oldData?.FirstOrDefault(x=>x.Name.ToLower().Equals(current.Name.ToLower())) is null)
@@ -26,6 +30,9 @@ public static class HackerOneChanges
                     Console.WriteLine("HackerOne : New Program =>");
                     Console.WriteLine($"\t{current.Name}");
                     Console.WriteLine($"\t\t{JsonSerializer.Serialize(current.Targets)}");
+                    await changesFileTextWriter.WriteAsync("HackerOne : New Program =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current.Name}\n");
+                    await changesFileTextWriter.WriteAsync($"\t\t{JsonSerializer.Serialize(current.Targets)}\n");
                     continue;
                 }
 
@@ -38,6 +45,8 @@ public static class HackerOneChanges
                             hasChanged = true;
                             Console.WriteLine($"HackerOne : New In Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentInScope.AssetIdentifier} : {currentInScope.AssetType}");
+                            await changesFileTextWriter.WriteAsync($"HackerOne : New In Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentInScope.AssetIdentifier} : {currentInScope.AssetType}\n");
                         }
                     }
                 
@@ -48,6 +57,8 @@ public static class HackerOneChanges
                             hasChanged = true;
                             Console.WriteLine($"HackerOne : New Out Of Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentOutOfScope.AssetIdentifier} : {currentOutOfScope.AssetType}");
+                            await changesFileTextWriter.WriteAsync($"HackerOne : New Out Of Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentOutOfScope.AssetIdentifier} : {currentOutOfScope.AssetType} \n");
                         }
                     }
                 }
@@ -64,7 +75,10 @@ public static class HackerOneChanges
             else
             {
                 Console.WriteLine($"Hackerone : No Changes");
+                await changesFileTextWriter.WriteAsync($"Hackerone : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
             textReader.Dispose();
         }
         catch (Exception e)

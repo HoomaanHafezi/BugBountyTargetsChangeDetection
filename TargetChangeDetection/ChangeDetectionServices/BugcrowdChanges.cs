@@ -21,6 +21,10 @@ public static class BugcrowdChanges
         
             Console.WriteLine("\nBugcrowd ------------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "BugCrowdDataChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData)
             {
                 if (oldData?.FirstOrDefault(x=>x.Name.ToLower().Equals(current.Name.ToLower())) is null)
@@ -29,6 +33,9 @@ public static class BugcrowdChanges
                     Console.WriteLine("Bugcrowd : New Program =>");
                     Console.WriteLine($"\t{current.Name}");
                     Console.WriteLine($"\t\t{JsonSerializer.Serialize(current.Targets)}");
+                    await changesFileTextWriter.WriteAsync("Bugcrowd : New Program =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current.Name} \n");
+                    await changesFileTextWriter.WriteAsync($"\t\t{JsonSerializer.Serialize(current.Targets)} \n");
                     continue;
                 }
 
@@ -41,6 +48,8 @@ public static class BugcrowdChanges
                             hasChanged = true;
                             Console.WriteLine($"Bugcrowd : New In Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentInScope.Target} : {currentInScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"Bugcrowd : New In Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentInScope.Target} : {currentInScope.Type}\n");
                         }
                     }
                 
@@ -51,6 +60,8 @@ public static class BugcrowdChanges
                             hasChanged = true;
                             Console.WriteLine($"Bugcrowd : New Out Of Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentOutOfScope.Target} : {currentOutOfScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"Bugcrowd : New Out Of Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentOutOfScope.Target} : {currentOutOfScope.Type}\n");
                         }
                     }
                 }
@@ -67,7 +78,10 @@ public static class BugcrowdChanges
             else
             {
                 Console.WriteLine($"Bugcrowd : No Changes");
+                await changesFileTextWriter.WriteAsync($"Bugcrowd : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
 
             textReader.Dispose();
         }

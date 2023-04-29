@@ -19,6 +19,10 @@ public static class IntigritiChanges
             Console.WriteLine(
                 "\nIntigriti -----------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "IntigritiDataChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData)
             {
                 if (oldData?.FirstOrDefault(x => x.Name.ToLower().Equals(current.Name.ToLower())) is null)
@@ -27,6 +31,9 @@ public static class IntigritiChanges
                     Console.WriteLine("Intigriti : New Program =>");
                     Console.WriteLine($"\t{current.Name}");
                     Console.WriteLine($"\t\t{JsonSerializer.Serialize(current.Targets)}");
+                    await changesFileTextWriter.WriteAsync("Intigriti : New Program =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current.Name} \n");
+                    await changesFileTextWriter.WriteAsync($"\t\t{JsonSerializer.Serialize(current.Targets)} \n");
                     continue;
                 }
 
@@ -40,6 +47,8 @@ public static class IntigritiChanges
                             hasChanged = true;
                             Console.WriteLine($"Intigriti : New In Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentInScope.Endpoint} : {currentInScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"Intigriti : New In Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentInScope.Endpoint} : {currentInScope.Type}\n");
                         }
                     }
 
@@ -52,6 +61,8 @@ public static class IntigritiChanges
                             hasChanged = true;
                             Console.WriteLine($"Intigriti : New Out Of Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentOutOfScope.Endpoint} : {currentOutOfScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"Intigriti : New Out Of Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentOutOfScope.Endpoint} : {currentOutOfScope.Type}\n");
                         }
                     }
                 }
@@ -68,7 +79,10 @@ public static class IntigritiChanges
             else
             {
                 Console.WriteLine($"Intigriti : No Changes");
+                await changesFileTextWriter.WriteAsync($"Intigriti : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
 
             textReader.Dispose();
         }

@@ -17,6 +17,10 @@ public class DomainChanges
             Console.WriteLine(
                 "\nDomains -----------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "DomainsChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData.Split("\n"))
             {
                 if (oldData.FirstOrDefault(x => x.ToLower().Equals(current.ToLower())) is null)
@@ -24,6 +28,8 @@ public class DomainChanges
                     hasChanged = true;
                     Console.WriteLine("Domains : New Target =>");
                     Console.WriteLine($"\t{current}");
+                    await changesFileTextWriter.WriteAsync("Domains : New Target =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current} \n");
                 }
             }
 
@@ -38,7 +44,10 @@ public class DomainChanges
             else
             {
                 Console.WriteLine($"Domains : No Changes");
+                await changesFileTextWriter.WriteAsync($"Domains : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
 
             textReader.Dispose();
         }

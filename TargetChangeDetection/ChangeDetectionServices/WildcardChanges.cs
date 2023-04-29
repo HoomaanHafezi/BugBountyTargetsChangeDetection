@@ -19,6 +19,10 @@ public static class WildcardChanges
             Console.WriteLine(
                 "\nWildcard -----------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "WildcardsChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData.Split("\n"))
             {
                 if (oldData.FirstOrDefault(x => x.ToLower().Equals(current.ToLower())) is null)
@@ -26,6 +30,8 @@ public static class WildcardChanges
                     hasChanged = true;
                     Console.WriteLine("Wildcard : New Target =>");
                     Console.WriteLine($"\t{current}");
+                    await changesFileTextWriter.WriteAsync("Wildcard : New Target =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current} \n");
                 }
             }
 
@@ -40,7 +46,10 @@ public static class WildcardChanges
             else
             {
                 Console.WriteLine($"Wildcard : No Changes");
+                await changesFileTextWriter.WriteAsync($"Wildcard : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
 
             textReader.Dispose();
         }

@@ -19,6 +19,10 @@ public static class YesWeHackChanges
             Console.WriteLine(
                 "\nYesWeHack -----------------------------------------------------------------------------------------");
 
+            var changesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Changes", "YesWeHackDataChanges.txt");
+            StreamWriter changesFileTextWriter = File.AppendText(changesFilePath);
+            await changesFileTextWriter.WriteAsync($"{DateTime.Now}=============================================================================\n");
+
             foreach (var current in currentData)
             {
                 if (oldData?.FirstOrDefault(x => x.Name.ToLower().Equals(current.Name.ToLower())) is null)
@@ -27,6 +31,9 @@ public static class YesWeHackChanges
                     Console.WriteLine("YesWeHack : New Program =>");
                     Console.WriteLine($"\t{current.Name}");
                     Console.WriteLine($"\t\t{JsonSerializer.Serialize(current.Targets)}");
+                    await changesFileTextWriter.WriteAsync("YesWeHack : New Program =>\n");
+                    await changesFileTextWriter.WriteAsync($"\t{current.Name}\n");
+                    await changesFileTextWriter.WriteAsync($"\t\t{JsonSerializer.Serialize(current.Targets)}\n");
                     continue;
                 }
 
@@ -40,6 +47,8 @@ public static class YesWeHackChanges
                             hasChanged = true;
                             Console.WriteLine($"YesWeHack : New In Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentInScope.Target} : {currentInScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"YesWeHack : New In Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentInScope.Target} : {currentInScope.Type}\n");
                         }
                     }
 
@@ -52,6 +61,8 @@ public static class YesWeHackChanges
                             hasChanged = true;
                             Console.WriteLine($"YesWeHack : New Out Of Scope Target For {current.Name} =>");
                             Console.WriteLine($"\t\t{currentOutOfScope.Target} : {currentOutOfScope.Type}");
+                            await changesFileTextWriter.WriteAsync($"YesWeHack : New Out Of Scope Target For {current.Name} =>\n");
+                            await changesFileTextWriter.WriteAsync($"\t\t{currentOutOfScope.Target} : {currentOutOfScope.Type}\n");
                         }
                     }
                 }
@@ -68,7 +79,10 @@ public static class YesWeHackChanges
             else
             {
                 Console.WriteLine($"YesWeHack : No Changes");
+                await changesFileTextWriter.WriteAsync($"YesWeHack : No Changes\n");
             }
+            changesFileTextWriter.Close();
+            await changesFileTextWriter.DisposeAsync();
 
             textReader.Dispose();
         }
